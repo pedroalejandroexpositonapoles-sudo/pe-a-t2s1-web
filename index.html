@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peña T2S1 - Aniversario</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- ENCABEZADO CON EL LOGO -->
+    <header class="main-header">
+        <div class="header-content">
+            <img src="logo.jpeg" alt="Logo Peña T2S1" class="logo-img">
+            <div class="header-text">
+                <h1>Peña Deportiva T2S1</h1>
+                <p>¡Millón unidos y compenetrados por el deporte!</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL DE 3 COLUMNAS -->
+    <div class="layout-grid">
+        
+        <!-- COLUMNA IZQUIERDA: OCCIDENTE -->
+        <aside class="sidebar left-sidebar">
+            <h3>Occidente</h3>
+            <div class="team-logos-grid">
+                <img src="logopinardelrio.jpeg" alt="Pinar del Río" class="team-logo" title="Pinar del Río">
+                <img src="logolaisladelajuventud.jpeg" alt="Isla de la Juventud" class="team-logo" title="Isla de la Juventud">
+                <img src="logomayabeque.jpeg" alt="Mayabeque" class="team-logo" title="Mayabeque">
+                <img src="logoartemisa.jpeg" alt="Artemisa" class="team-logo" title="Artemisa">
+                <img src="logoindustriales.jpeg" alt="Industriales" class="team-logo" title="Industriales">
+                <img src="logomatanzas.jpeg" alt="Matanzas" class="team-logo" title="Matanzas">
+                <img src="logocienfuegos.jpeg" alt="Cienfuegos" class="team-logo" title="Cienfuegos">
+                <img src="logovillaclara.jpeg" alt="Villa Clara" class="team-logo" title="Villa Clara">
+            </div>
+        </aside>
+
+        <!-- COLUMNA CENTRAL: TU PÁGINA -->
+        <main class="main-content">
+            <!-- SECCIÓN DE BIENVENIDA / LOGIN -->
+            <section class="card" id="login-section">
+                <h2>Bienvenido</h2>
+                <p>Ingresa tu nombre o apodo para guardar tus predicciones y aparecer en la tabla.</p>
+                <div class="input-group">
+                    <input type="text" id="userName" placeholder="Tu nombre o apodo...">
+                    <button class="btn btn-primary" onclick="guardarNombre()">Guardar</button>
+                </div>
+                <p id="saludo" class="highlight-text"></p>
+            </section>
+
+            <!-- SECCIÓN DE PRONÓSTICOS DE PLAYOFFS -->
+            <section class="card" id="predictions-section" style="display: none;">
+                <div class="card-header">
+                    <h2>Pronósticos de Postemporada</h2>
+                    <!-- AQUÍ ESTÁ EL CAMBIO: Usamos una imagen en vez del emoji -->
+                    <span class="badge" style="display: flex; align-items: center; gap: 5px;">
+                        Playoffs <img src="https://upload.wikimedia.org/wikipedia/commons/b/bd/Flag_of_Cuba.svg" alt="Cuba" style="width: 20px; height: 12px; border-radius: 2px;">
+                    </span>
+                </div>
+                <p class="instruction">Escribe cuántas victorias crees que tendrá el ganador en cada llave. <strong>Ojo:</strong> Las zonas son a ganar 2 y la Final a ganar 4.</p>
+                
+                <!-- ZONA OCCIDENTAL -->
+                <div class="round-block">
+                    <div class="round-title">Zona Occidental (A ganar 2)</div>
+                    
+                    <div class="match">
+                        <div class="team"><span class="team-name">1ro Occ</span><input type="number" min="0" max="2" class="victory-input" id="occ_1_vs_2"></div>
+                        <span class="vs">vs</span>
+                        <div class="team"><span class="team-name">2do Occ</span><input type="number" min="0" max="2" class="victory-input" id="occ_2_vs_1"></div>
+                    </div>
+                    <p class="note-small">El ganador pasa directo a la Final de Zona. El perdedor va al Repechaje.</p>
+                    
+                    <div class="match" style="margin-top: 10px;">
+                        <div class="team"><span class="team-name">3ro Occ</span><input type="number" min="0" max="2" class="victory-input" id="occ_3_vs_4"></div>
+                        <span class="vs">vs</span>
+                        <div class="team"><span class="team-name">4to Occ</span><input type="number" min="0" max="2" class="victory-input" id="occ_4_vs_3"></div>
+                    </div>
+                    <p class="note-small">El perdedor queda eliminado. El ganador va al Repechaje.</p>
+
+                    <div class="match" style="margin-top: 10px;">
+                        <div class="team"><span class="team-name">Perdedor 1-2</span><input type="number" min="0" max="2" class="victory-input" id="occ_repechaje_a"></div>
+                        <span class="vs">vs</span>
+                        <div class="team"><span class="team-name">Ganador 3-4</span><input type="number" min="0" max="2" class="victory-input" id="occ_repechaje_b"></div>
+                    </div>
+                    <p class="note-small">Repechaje: El que gane avanza a la Final de Zona.</p>
+
+                    <div class="match" style="margin-top: 10px; border: 2px solid var(--rojo-vibrante);">
+                        <div class="team"><span class="team-name">Ganador 1-2</span><input type="number" min="0" max="2" class="victory-input" id="occ_final_a"></div>
+                        <span class="vs">vs</span>
+                        <div class="team"><span class="team-name">Ganador Repechaje</span><input type="number" min="0" max="2" class="victory-input" id="occ_final_b"></div>
+                    </div>
+                    <p class="note-small">Final de Zona Occidental (A ganar 2).</p>
+                </div>
+
+                <!-- ZONA ORIENTAL -->
+                <div class="round-block" style="margin-top: 1.5rem;">
+                    <div class="round-title">Zona Oriental (A ganar 2)</div>
+                    
+                    <div class="match">
+                        <div class="team"><span class="team-name">1ro Or</span><input type="number" min="0" max="2" class="victory-input" id="or_1_vs_2"></div>
+                        <span class="vs">vs</span>
+                        <div class="team"><span class="team-name">2do Or</span><input type="number" min="0" max="2" class="victory-input" id="or_2_vs_1"></div>
+                    </div>
+                    <p class="note-small">El ganador pasa directo a la Final de Zona. El perdedor va al Repechaje.</p>
+                    
+                    <div class="match" style="margin-top: 10px;">
+                        <div class="team"><span class="team-name">3ro Or</span><input type="number" min="0" max="2" class="victory-input" id="or_3_vs_4"></div>
+                        <span class="vs">vs</span>
+                        <div class="team"><span class="team-name">4to Or</span><input type="number" min="0" max="2" class="victory-input" id="or_4_vs_3"></div>
+                    </div>
+                    <p class="note-small">El perdedor queda eliminado. El ganador va al Repechaje.</p>
+
+                    <div class="match" style="margin-top: 10px;">
+                        <div class="team"><span class="team-name">Perdedor 1-2</span><input type="number" min="0" max="2" class="victory-input" id="or_repechaje_a"></div>
+                        <span class="vs">vs</span>
+                        <div class="team"><span class="team-name">Ganador 3-4</span><input type="number" min="0" max="2" class="victory-input" id="or_repechaje_b"></div>
+                    </div>
+                    <p class="note-small">Repechaje: El que gane avanza a la Final de Zona.</p>
+
+                    <div class="match" style="margin-top: 10px; border: 2px solid var(--rojo-vibrante);">
+                        <div class="team"><span class="team-name">Ganador 1-2</span><input type="number" min="0" max="2" class="victory-input" id="or_final_a"></div>
+                        <span class="vs">vs</span>
+                        <div class="team"><span class="team-name">Ganador Repechaje</span><input type="number" min="0" max="2" class="victory-input" id="or_final_b"></div>
+                    </div>
+                    <p class="note-small">Final de Zona Oriental (A ganar 2).</p>
+                </div>
+
+                <!-- GRAN FINAL -->
+                <div class="round-block" style="margin-top: 1.5rem; border: 3px solid var(--rojo-vibrante); background: #fffdf5;">
+                    <div class="round-title" style="background: var(--rojo-vibrante);">Gran Final Nacional (A ganar 4)</div>
+                    <div class="match">
+                        <div class="team"><span class="team-name">Campeón Occ</span><input type="number" min="0" max="4" class="victory-input" id="nacional_occ"></div>
+                        <span class="vs">vs</span>
+                        <div class="team"><span class="team-name">Campeón Or</span><input type="number" min="0" max="4" class="victory-input" id="nacional_or"></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-accent" onclick="guardarPronosticosPlayoffs()" style="width: 100%; margin-top: 1.5rem;">Guardar Playoffs</button>
+            </section>
+
+            <!-- BONUS FINAL -->
+            <section class="card" id="bonus-section" style="display: none;">
+                <div class="card-header">
+                    <h2>Pronóstico Bonus</h2>
+                    <span class="badge">Final</span>
+                </div>
+                <p class="instruction">Adivina quién será el Campeón y Subcampeón para sumar puntos extra.</p>
+                
+                <div class="bonus-inputs">
+                    <div class="input-group">
+                        <label>Campeón:</label>
+                        <select id="campeonSelect">
+                            <option value="">Selecciona al Campeón...</option>
+                            <option value="Pinar del Río">Pinar del Río</option>
+                            <option value="Isla de la Juventud">Isla de la Juventud</option>
+                            <option value="Mayabeque">Mayabeque</option>
+                            <option value="Artemisa">Artemisa</option>
+                            <option value="Industriales">Industriales</option>
+                            <option value="Matanzas">Matanzas</option>
+                            <option value="Cienfuegos">Cienfuegos</option>
+                            <option value="Villa Clara">Villa Clara</option>
+                            <option value="Sancti Spíritus">Sancti Spíritus</option>
+                            <option value="Ciego de Ávila">Ciego de Ávila</option>
+                            <option value="Camagüey">Camagüey</option>
+                            <option value="Las Tunas">Las Tunas</option>
+                            <option value="Holguín">Holguín</option>
+                            <option value="Granma">Granma</option>
+                            <option value="Guantánamo">Guantánamo</option>
+                            <option value="Santiago de Cuba">Santiago de Cuba</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Subcampeón:</label>
+                        <select id="subcampeonSelect">
+                            <option value="">Selecciona al Subcampeón...</option>
+                            <option value="Pinar del Río">Pinar del Río</option>
+                            <option value="Isla de la Juventud">Isla de la Juventud</option>
+                            <option value="Mayabeque">Mayabeque</option>
+                            <option value="Artemisa">Artemisa</option>
+                            <option value="Industriales">Industriales</option>
+                            <option value="Matanzas">Matanzas</option>
+                            <option value="Cienfuegos">Cienfuegos</option>
+                            <option value="Villa Clara">Villa Clara</option>
+                            <option value="Sancti Spíritus">Sancti Spíritus</option>
+                            <option value="Ciego de Ávila">Ciego de Ávila</option>
+                            <option value="Camagüey">Camagüey</option>
+                            <option value="Las Tunas">Las Tunas</option>
+                            <option value="Holguín">Holguín</option>
+                            <option value="Granma">Granma</option>
+                            <option value="Guantánamo">Guantánamo</option>
+                            <option value="Santiago de Cuba">Santiago de Cuba</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-accent" onclick="guardarBonus()" style="width: 100%; margin-top: 1rem;">Guardar Bonus</button>
+            </section>
+
+            <!-- TABLA DE POSICIONES -->
+            <section class="card">
+                <h2>Tabla de Posiciones</h2>
+                <div class="table-responsive">
+                    <table class="score-table" id="scoreTable">
+                        <thead>
+                            <tr>
+                                <th>Pos</th>
+                                <th>Usuario</th>
+                                <th>PJ</th>
+                                <th>Exactos</th>
+                                <th>Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <tr><td colspan="5" style="text-align: center;">Aún no hay puntuaciones en la tabla.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <!-- COLUMNA DERECHA: ORIENTE -->
+        <aside class="sidebar right-sidebar">
+            <h3>Oriente</h3>
+            <div class="team-logos-grid">
+                <img src="logosanctispiritus.jpeg" alt="Sancti Spíritus" class="team-logo" title="Sancti Spíritus">
+                <img src="logociegodeavila.jpeg" alt="Ciego de Ávila" class="team-logo" title="Ciego de Ávila">
+                <img src="logocamaguey.jpeg" alt="Camagüey" class="team-logo" title="Camagüey">
+                <img src="logolastunas.jpeg" alt="Las Tunas" class="team-logo" title="Las Tunas">
+                <img src="logoholguin.jpeg" alt="Holguín" class="team-logo" title="Holguín">
+                <img src="logogranma.jpeg" alt="Granma" class="team-logo" title="Granma">
+                <img src="logoguantanamo.jpeg" alt="Guantánamo" class="team-logo" title="Guantánamo">
+                <img src="logosantiagodecuba.jpeg" alt="Santiago de Cuba" class="team-logo" title="Santiago de Cuba">
+            </div>
+        </aside>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Peña T2S1 - ¡Rumbo al título!</p>
+        <a href="https://chat.whatsapp.com/LpTmwBoepi6CqWdaCb3iMn" target="_blank" class="whatsapp-link">Únete a nuestro grupo de WhatsApp</a>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
