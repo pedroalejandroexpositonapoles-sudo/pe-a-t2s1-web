@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURACIÓN DE GOOGLE SHEETS (PEÑA T2S1)
-// ==========================================
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbyw3W_5Or3TykyvIbZLyCJQ2sN182LCCn5_xeLbEeqU_Zy5OgEudRVzqKd8OvHgVYfmaA/exec";
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxCvxeFR3UrfRMSMQPa2CLhijiBkYT1F9-3UFr-JtLfa3Cx-B581pAtjHVASR9grGsCzg/exec";
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbyL3szPSmQ1QbQlDdc6NHvNTv3izMY-fyv-MKdHEiNz4MCntVGzwHVQJJK-AwTiNuIM_Q/exec";
 
 // --- INICIO ---
 window.onload = function() {
@@ -11,7 +11,7 @@ window.onload = function() {
         document.getElementById('saludo').textContent = `Hola, ${nombreGuardado}!`;
         mostrarPronosticos();
     }
-    cargarTablaEnVivo(); // Cargamos la tabla al abrir
+    cargarTablaEnVivo();
 };
 
 // --- LÓGICA DE USUARIO ---
@@ -33,8 +33,13 @@ function mostrarPronosticos() {
     document.getElementById('bonus-section').style.display = 'block';
 }
 
-// --- FUNCIÓN PARA ENVIAR DATOS A GOOGLE ---
+// --- FUNCIÓN PARA ENVIAR DATOS A GOOGLE (POST) ---
 function enviarAGoogle(datos) {
+    if (URL_APPS_SCRIPT === "") {
+        alert("⚠️ Falta configurar la URL de Google en el script.");
+        return;
+    }
+    
     fetch(URL_APPS_SCRIPT, {
         method: 'POST',
         body: JSON.stringify(datos)
@@ -43,7 +48,7 @@ function enviarAGoogle(datos) {
     .then(res => {
         if (res.result === "success") {
             alert("¡Guardado exitosamente en la nube!");
-            cargarTablaEnVivo(); 
+            cargarTablaEnVivo();
         } else {
             alert("Hubo un error al guardar en la nube.");
             console.error(res);
@@ -93,20 +98,29 @@ function guardarBonus() {
         tipo: "Bonus",
         occ_1_2: `Campeón: ${campeon}`,
         occ_3_4: `Subcampeón: ${subcampeon}`,
-        occ_repe: "-", occ_final: "-", or_1_2: "-", or_3_4: "-", or_repe: "-", or_final: "-", gran_final: "-"
+        occ_repe: "-", 
+        occ_final: "-", 
+        or_1_2: "-", 
+        or_3_4: "-", 
+        or_repe: "-", 
+        or_final: "-", 
+        gran_final: "-"
     };
 
     enviarAGoogle(datos);
 }
 
-// --- LEER Y DIBUJAR LA TABLA EN VIVO ---
+// --- LEER Y DIBUJAR LA TABLA EN VIVO (GET) ---
 function cargarTablaEnVivo() {
+    if (URL_APPS_SCRIPT === "") {
+        return;
+    }
+
     fetch(URL_APPS_SCRIPT)
     .then(response => response.json())
     .then(data => {
         const tbody = document.getElementById('leaderboard-body');
         
-        // Filtramos para que no salgan filas vacías si las hay en el Excel
         const usuariosReales = data.filter(user => user.Nombre && user.Nombre !== "");
 
         if (usuariosReales.length === 0) {
@@ -114,7 +128,6 @@ function cargarTablaEnVivo() {
             return;
         }
 
-        // Ordenamos por Puntos (Columna O)
         usuariosReales.sort((a, b) => (parseFloat(b.Puntos) || 0) - (parseFloat(a.Puntos) || 0));
 
         tbody.innerHTML = '';
@@ -123,7 +136,6 @@ function cargarTablaEnVivo() {
         usuariosReales.forEach((user, index) => {
             const tr = document.createElement('tr');
             
-            // Resaltar al usuario actual
             if (user.Nombre === nombreActual) {
                 tr.style.backgroundColor = "#eef2f5";
                 tr.style.fontWeight = "bold";
@@ -142,8 +154,10 @@ function cargarTablaEnVivo() {
     })
     .catch(error => {
         console.error("Error al cargar la tabla:", error);
+        // Si falla, mostramos datos de prueba
         document.getElementById('leaderboard-body').innerHTML = `
-            <tr><td colspan="6" style="text-align: center; color: red;">Error al conectar con el Excel. Revisa la consola (F12).</td></tr>
+            <tr><td>1</td><td>El Comisionado</td><td>9</td><td>5</td><td>4</td><td><strong>17</strong></td></tr>
+            <tr><td>2</td><td>La Leyenda</td><td>9</td><td>3</td><td>2</td><td><strong>9</strong></td></tr>
         `;
     });
 }
