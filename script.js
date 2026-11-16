@@ -1,264 +1,172 @@
-// ==========================================
-// CONFIGURACIÓN DE GOOGLE SHEETS (PEÑA T2S1)
-// ==========================================
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxS8S0NzL3sXVdYTnUw5-nnu_a28WQjHXdnhhOH2kzFZ5SdlmkhKhGcH8hPSGVyzg29EA/exec";
-
-// --- DATOS DE LOS EQUIPOS PARA LAS ZONAS ---
-const equiposOccidentales = ["Pinar del Río", "Isla de la Juventud", "Mayabeque", "Artemisa", "Industriales", "Matanzas", "Cienfuegos", "Villa Clara"];
-const equiposOrientales = ["Sancti Spíritus", "Ciego de Ávila", "Camagüey", "Las Tunas", "Holguín", "Granma", "Guantánamo", "Santiago de Cuba"];
-
-// --- LÓGICA DE PESTAÑAS ---
-function cambiarPestana(idPestana, boton) {
-    const pestanas = document.querySelectorAll('.tab-content');
-    pestanas.forEach(p => p.classList.remove('active'));
-    const botones = document.querySelectorAll('.nav-btn');
-    botones.forEach(b => b.classList.remove('active'));
-    document.getElementById(idPestana).classList.add('active');
-    boton.classList.add('active');
+:root {
+    --azul-oscuro: #0b1b36;
+    --rojo-vibrante: #d91c1c;
+    --fondo-gris: #f0f4f8;
+    --blanco: #ffffff;
+    --texto: #333333;
+    --borde: #e0e0e0;
 }
 
-// --- INICIO ---
-window.onload = function() {
-    const nombreGuardado = localStorage.getItem('nombrePenaT2S1');
-    const equipoGuardado = localStorage.getItem('equipoPenaT2S1');
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+body { background: var(--fondo-gris); color: var(--texto); line-height: 1.6; padding-bottom: 2rem; }
+
+/* ESTILO PARA LA MARCA DE AGUA DEL FONDO */
+body {
+    background-image: url('logosnb.jpeg'); 
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    background-size: 60%; 
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(240, 244, 248, 0.90);
+    z-index: -1;
+}
+
+/* ENCABEZADO */
+header { background: var(--azul-oscuro); color: white; text-align: center; padding: 1.5rem 1rem; border-bottom: 6px solid var(--rojo-vibrante); box-shadow: 0 4px 10px rgba(0,0,0,0.2); position: relative; z-index: 10;}
+.header-content { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.logo-img { max-width: 150px; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.5);}
+header h1 { font-size: 2.2rem; margin-bottom: 0.2rem; text-transform: uppercase; letter-spacing: 1px;}
+header p { font-size: 1rem; color: #a0b2c6; font-style: italic;}
+
+/* MENÚ DE PESTAÑAS */
+.app-nav {
+    background-color: #12293f;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 4px solid var(--rojo-vibrante);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    flex-wrap: wrap;
+    gap: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.nav-btn {
+    background: transparent;
+    color: #a0b2c6;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.nav-btn:hover { color: white; }
+.nav-btn.active {
+    background-color: var(--rojo-vibrante);
+    color: white;
+}
+
+/* DISEÑO DE 3 COLUMNAS */
+.layout-grid {
+    display: grid;
+    grid-template-columns: 180px 1fr 180px;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 1rem;
+    align-items: start;
+    position: relative;
+    z-index: 1;
+}
+
+/* BARRAS LATERALES DE EQUIPOS */
+.sidebar { background: var(--blanco); border-radius: 12px; padding: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.08); position: sticky; top: 70px; }
+.sidebar h3 { text-align: center; color: var(--azul-oscuro); margin-bottom: 1rem; font-size: 1rem; border-bottom: 2px solid var(--rojo-vibrante); padding-bottom: 0.5rem; text-transform: uppercase;}
+.team-logos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.team-logo { width: 100%; height: auto; border-radius: 8px; cursor: pointer; transition: transform 0.2s; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+.team-logo:hover { transform: scale(1.1); }
+
+/* CONTENIDO CENTRAL Y PESTAÑAS */
+.main-content { display: flex; flex-direction: column; }
+.tab-content { display: none; animation: fadeIn 0.3s ease; }
+.tab-content.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+.card { background: var(--blanco); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 6px 12px rgba(0,0,0,0.08); border-top: 5px solid var(--azul-oscuro);}
+.card h2 { color: var(--azul-oscuro); margin-bottom: 1rem; font-size: 1.4rem; }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 2px solid #eee; padding-bottom: 0.5rem; }
+.badge { background: var(--rojo-vibrante); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+
+/* FORMULARIOS Y BOTONES */
+.input-group { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+input[type="text"], input[type="number"], select { padding: 0.7rem; border: 2px solid #ccc; border-radius: 8px; font-size: 1rem; width: 100%; max-width: 100%; }
+input:focus, select:focus { outline: none; border-color: var(--azul-oscuro); }
+.btn { padding: 0.7rem 1.5rem; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s;}
+.btn:hover { transform: translateY(-2px); opacity: 0.9; }
+.btn-primary { background: var(--azul-oscuro); color: white; }
+.btn-accent { background: var(--rojo-vibrante); color: white; width: 100%; }
+.highlight-text { margin-top: 1rem; font-size: 1.1rem; font-weight: bold; color: var(--rojo-vibrante); }
+
+/* DISEÑO DE LOS CRUCES (PLAYOFFS) */
+.round-block { border: 2px solid #f0f4f8; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; background: #fff;}
+.round-title { background: var(--azul-oscuro); color: white; padding: 0.4rem 0.8rem; border-radius: 4px; font-weight: bold; text-align: center; margin-bottom: 1rem; text-transform: uppercase; font-size: 0.85rem; }
+.match { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 0.8rem; border-radius: 8px; margin-bottom: 0.5rem; border: 1px solid var(--borde); }
+.match:last-child { margin-bottom: 0; }
+.final-match { border: 2px solid var(--rojo-vibrante); }
+.team { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; width: 45%; text-align: center; }
+
+/* ESTILO PARA LOS MINI-LOGOS EN LOS CRUCES */
+.team-name { display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 0.9rem; }
+.mini-logo { width: 24px; height: 24px; object-fit: contain; border-radius: 50%; background-color: white; padding: 2px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+.victory-input { width: 60px !important; text-align: center; font-weight: bold; padding: 0.3rem; }
+.vs { font-weight: bold; color: var(--rojo-vibrante); font-size: 0.8rem; }
+.note-small { font-size: 0.75rem; color: #666; text-align: center; margin-bottom: 10px; font-style: italic;}
+
+/* DISEÑO DE LAS ZONAS (ARRASTRAR Y SOLTAR) */
+.groups-container { display: flex; flex-direction: column; gap: 20px; margin-top: 15px; }
+.group-box { background: #f9f9f9; padding: 15px; border-radius: 10px; border: 2px solid var(--borde); }
+.group-box h4 { color: var(--azul-oscuro); margin-bottom: 10px; text-align: center; border-bottom: 2px solid #ddd; padding-bottom: 5px;}
+.drag-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.drag-list li { background: var(--blanco); padding: 12px 15px; border-radius: 8px; border: 1px solid #ccc; cursor: grab; font-weight: 500; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: background 0.2s, transform 0.1s;}
+.drag-list li:hover { background: #f0f4f8; border-color: var(--azul-oscuro); }
+.drag-list li:active { cursor: grabbing; }
+.drag-list li.dragging { opacity: 0.5; background: #eef2f5; transform: scale(1.02); }
+
+/* TABLA */
+.table-responsive { overflow-x: auto; }
+.score-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
+.score-table th, .score-table td { padding: 0.8rem; text-align: left; border-bottom: 1px solid var(--borde); }
+.score-table th { background: var(--azul-oscuro); color: white; }
+.score-table tr:hover { background-color: #f9f9f9; }
+
+/* FOOTER */
+footer { text-align: center; margin-top: 3rem; color: #888; font-size: 0.9rem; position: relative; z-index: 1;}
+
+/* =========================================
+   DISEÑO RESPONSIVO (PARA CELULARES)
+   ========================================= */
+@media (max-width: 1024px) {
+    /* Cambiamos a 1 sola columna en el celular */
+    .layout-grid { grid-template-columns: 1fr; }
     
-    if (nombreGuardado) {
-        document.getElementById('userName').value = nombreGuardado;
-        document.getElementById('saludo').textContent = `Hola, ${nombreGuardado}!`;
-        if (equipoGuardado) document.getElementById('equipoFavorito').value = equipoGuardado;
-    }
+    /* Acomodamos el orden para que salga primero el menú y luego los logos abajo */
+    .main-content { order: 1; }
+    .left-sidebar { order: 2; margin-top: 10px; }
+    .right-sidebar { order: 3; margin-top: 10px; }
     
-    renderizarZonas();
-    cargarTablaEnVivo();
-};
-
-// --- GUARDAR PERFIL ---
-function guardarPerfil() {
-    const nombre = document.getElementById('userName').value.trim();
-    const equipo = document.getElementById('equipoFavorito').value;
-
-    if (nombre === "") { alert("Por favor, ingresa tu nombre."); return; }
-    if (equipo === "") { alert("Por favor, selecciona tu equipo favorito."); return; }
-
-    localStorage.setItem('nombrePenaT2S1', nombre);
-    localStorage.setItem('equipoPenaT2S1', equipo);
+    /* Hacemos que las barras laterales no se queden pegadas al hacer scroll */
+    .sidebar { position: relative; top: 0; }
     
-    document.getElementById('saludo').textContent = `Hola, ${nombre}! Tu equipo es ${equipo}.`;
-    alert(`¡Perfil guardado! Bienvenido, ${nombre} (Fan de ${equipo}).`);
+    /* LOS LOGOS SE HACEN PEQUEÑOS PARA QUE NO SE DESBORDEN */
+    .team-logos-grid { grid-template-columns: repeat(4, 1fr); gap: 5px;}
+    .team-logo { max-width: 50px; margin: 0 auto; }
     
-    cargarTablaEnVivo();
-}
-
-// --- FUNCIÓN PARA ENVIAR DATOS (CON PROXY PARA CELULARES) ---
-function enviarAGoogle(datos) {
-    if (URL_APPS_SCRIPT === "") { alert("⚠️ Falta configurar la URL de Google."); return; }
+    /* El menú superior se adapta */
+    .app-nav { flex-direction: row; justify-content: center; }
     
-    // EL TRUCO: Usamos un proxy para que el celular no bloquee la conexión
-    const URL_PROXY = "https://api.allorigins.win/raw?url=" + encodeURIComponent(URL_APPS_SCRIPT);
-
-    fetch(URL_PROXY, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'text/plain' 
-        },
-        body: JSON.stringify(datos)
-    })
-    .then(response => response.text())
-    .then(text => {
-        try {
-            const res = JSON.parse(text);
-            if (res.result === "success") {
-                alert("¡Guardado exitosamente en la nube!");
-                cargarTablaEnVivo();
-            } else {
-                alert("Hubo un error al guardar.");
-                console.error(res);
-            }
-        } catch(e) {
-            // A veces el proxy devuelve texto plano, asumimos que funcionó
-            alert("¡Guardado exitosamente en la nube!");
-            cargarTablaEnVivo();
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert("Error de conexión. Revisa tu internet.");
-    });
-}
-
-// --- GUARDAR PRONÓSTICOS DE PLAYOFFS ---
-function guardarPronosticosPlayoffs() {
-    const nombre = localStorage.getItem('nombrePenaT2S1');
-    const equipo = localStorage.getItem('equipoPenaT2S1');
-    
-    if (!nombre) { alert("Primero guarda tu nombre en la pestaña de Inicio."); return; }
-
-    const datos = {
-        nombre: nombre,
-        equipo: equipo || "Sin equipo",
-        tipo: "Playoffs",
-        occ_1_2: `${document.getElementById('occ_1_vs_2').value}-${document.getElementById('occ_2_vs_1').value}`,
-        occ_3_4: `${document.getElementById('occ_3_vs_4').value}-${document.getElementById('occ_4_vs_3').value}`,
-        occ_repe: `${document.getElementById('occ_repechaje_a').value}-${document.getElementById('occ_repechaje_b').value}`,
-        occ_final: `${document.getElementById('occ_final_a').value}-${document.getElementById('occ_final_b').value}`,
-        or_1_2: `${document.getElementById('or_1_vs_2').value}-${document.getElementById('or_2_vs_1').value}`,
-        or_3_4: `${document.getElementById('or_3_vs_4').value}-${document.getElementById('or_4_vs_3').value}`,
-        or_repe: `${document.getElementById('or_repechaje_a').value}-${document.getElementById('or_repechaje_b').value}`,
-        or_final: `${document.getElementById('or_final_a').value}-${document.getElementById('or_final_b').value}`,
-        gran_final: `${document.getElementById('nacional_occ').value}-${document.getElementById('nacional_or').value}`,
-        zona_occ: "-", zona_or: "-", campeon: "-", subcampeon: "-"
-    };
-
-    enviarAGoogle(datos);
-}
-
-// --- GUARDAR ZONAS ---
-function guardarZonas() {
-    const nombre = localStorage.getItem('nombrePenaT2S1');
-    const equipo = localStorage.getItem('equipoPenaT2S1');
-    if (!nombre) { alert("Primero guarda tu nombre en la pestaña de Inicio."); return; }
-
-    const ordenOcc = [...document.querySelectorAll('#zona-occidental li')].map(li => li.textContent).join(" > ");
-    const ordenOr = [...document.querySelectorAll('#zona-oriental li')].map(li => li.textContent).join(" > ");
-
-    const datos = {
-        nombre: nombre, equipo: equipo || "Sin equipo", tipo: "Zonas",
-        occ_1_2: "-", occ_3_4: "-", occ_repe: "-", occ_final: "-",
-        or_1_2: "-", or_3_4: "-", or_repe: "-", or_final: "-",
-        gran_final: "-", zona_occ: ordenOcc, zona_or: ordenOr,
-        campeon: "-", subcampeon: "-"
-    };
-
-    enviarAGoogle(datos);
-}
-
-// --- GUARDAR BONUS ---
-function guardarBonus() {
-    const nombre = localStorage.getItem('nombrePenaT2S1');
-    const equipo = localStorage.getItem('equipoPenaT2S1');
-    if (!nombre) { alert("Primero guarda tu nombre en la pestaña de Inicio."); return; }
-    
-    const campeon = document.getElementById('campeonSelect').value;
-    const subcampeon = document.getElementById('subcampeonSelect').value;
-
-    if (!campeon || !subcampeon) { alert("Debes seleccionar un Campeón y un Subcampeón."); return; }
-    if (campeon === subcampeon) { alert("El Campeón y el Subcampeón no pueden ser el mismo equipo."); return; }
-
-    const datos = {
-        nombre: nombre, equipo: equipo || "Sin equipo", tipo: "Bonus",
-        occ_1_2: "-", occ_3_4: "-", occ_repe: "-", occ_final: "-",
-        or_1_2: "-", or_3_4: "-", or_repe: "-", or_final: "-",
-        gran_final: "-", zona_occ: "-", zona_or: "-",
-        campeon: campeon, subcampeon: subcampeon
-    };
-
-    enviarAGoogle(datos);
-}
-
-// --- LÓGICA DE ARRASTRAR Y SOLTAR (ZONAS) ---
-function renderizarZonas() {
-    const zonaOcc = document.getElementById('zona-occidental');
-    const zonaOr = document.getElementById('zona-oriental');
-    if(!zonaOcc || !zonaOr) return;
-
-    zonaOcc.innerHTML = '';
-    zonaOr.innerHTML = '';
-
-    equiposOccidentales.forEach(eq => {
-        const li = document.createElement('li');
-        li.draggable = true;
-        li.textContent = eq;
-        configurarDrag(li);
-        zonaOcc.appendChild(li);
-    });
-
-    equiposOrientales.forEach(eq => {
-        const li = document.createElement('li');
-        li.draggable = true;
-        li.textContent = eq;
-        configurarDrag(li);
-        zonaOr.appendChild(li);
-    });
-}
-
-function configurarDrag(elemento) {
-    elemento.addEventListener('dragstart', () => elemento.classList.add('dragging'));
-    elemento.addEventListener('dragend', () => elemento.classList.remove('dragging'));
-}
-
-document.addEventListener('dragover', e => {
-    e.preventDefault();
-    const lista = e.target.closest('.drag-list');
-    if (!lista) return;
-    const dragging = document.querySelector('.dragging');
-    if (!dragging) return;
-    const afterElement = getDragAfterElement(lista, e.clientY);
-    if (afterElement == null) {
-        lista.appendChild(dragging);
-    } else {
-        lista.insertBefore(dragging, afterElement);
-    }
-});
-
-function getDragAfterElement(container, y) {
-    const draggableElements = [...container.querySelectorAll('li:not(.dragging)')];
-    return draggableElements.reduce((closest, child) => {
-        const box = child.getBoundingClientRect();
-        const offset = y - box.top - box.height / 2;
-        if (offset < 0 && offset > closest.offset) {
-            return { offset: offset, element: child };
-        } else {
-            return closest;
-        }
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
-}
-
-// --- LEER Y DIBUJAR LA TABLA ---
-function cargarTablaEnVivo() {
-    if (URL_APPS_SCRIPT === "") return;
-
-    // También usamos el proxy para leer los datos en el celular
-    const URL_PROXY_GET = "https://api.allorigins.win/raw?url=" + encodeURIComponent(URL_APPS_SCRIPT);
-
-    fetch(URL_PROXY_GET)
-    .then(response => response.json())
-    .then(data => {
-        const tbody = document.getElementById('leaderboard-body');
-        const usuariosReales = data.filter(user => user.Nombre && user.Nombre !== "");
-
-        if (usuariosReales.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Aún no hay puntuaciones.</td></tr>';
-            return;
-        }
-
-        usuariosReales.sort((a, b) => (parseFloat(b.Puntos) || 0) - (parseFloat(a.Puntos) || 0));
-
-        tbody.innerHTML = '';
-        const nombreActual = localStorage.getItem('nombrePenaT2S1');
-
-        usuariosReales.forEach((user, index) => {
-            const tr = document.createElement('tr');
-            if (user.Nombre === nombreActual) {
-                tr.style.backgroundColor = "#eef2f5";
-                tr.style.fontWeight = "bold";
-            }
-
-            tr.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${user.Nombre} ${user.Nombre === nombreActual ? '(Tú)' : ''}</td>
-                <td>${user.Equipo || '-'}</td>
-                <td>${user.PJ || 0}</td>
-                <td>${user.Ganadores || 0}</td>
-                <td>${user.Exactos || 0}</td>
-                <td><strong>${user.Puntos || 0}</strong></td>
-            `;
-            tbody.appendChild(tr);
-        });
-    })
-    .catch(error => {
-        console.error("Error tabla:", error);
-        document.getElementById('leaderboard-body').innerHTML = `
-            <tr><td colspan="7" style="text-align: center; color: red;">Error al cargar datos en el celular.</td></tr>
-        `;
-    });
+    /* Logo principal en celular un poco más pequeño */
+    .logo-img { max-width: 120px; }
 }
