@@ -81,7 +81,8 @@
                             <option value="Santiago de Cuba">Santiago de Cuba</option>
                         </select>
                         
-                        <button class="btn btn-primary" onclick="guardarPerfil()" style="margin-top: 15px;">Guardar Perfil</button>
+                        <!-- Botón con ID para el arreglo de celular -->
+                        <button class="btn btn-primary" id="btnGuardarPerfil" style="margin-top: 15px;">Guardar Perfil</button>
                     </div>
                     <p id="saludo" class="highlight-text"></p>
                 </div>
@@ -101,10 +102,8 @@
                     </div>
                     <p class="instruction">Escribe cuántas victorias crees que tendrá el ganador. <strong>Zonas:</strong> a ganar 2. <strong>Final:</strong> a ganar 4.</p>
                     
-                    <!-- ZONA OCCIDENTAL -->
                     <div class="round-block">
                         <div class="round-title">Zona Occidental</div>
-                        
                         <div class="match">
                             <div class="team">
                                 <span class="team-name"><img src="logoindustriales.jpeg" class="mini-logo"> Industriales</span>
@@ -158,10 +157,8 @@
                         <p class="note-small">Final de Zona Occidental.</p>
                     </div>
 
-                    <!-- ZONA ORIENTAL -->
                     <div class="round-block" style="margin-top: 1.5rem;">
                         <div class="round-title">Zona Oriental</div>
-                        
                         <div class="match">
                             <div class="team">
                                 <span class="team-name"><img src="logocamaguey.jpeg" class="mini-logo"> Camagüey</span>
@@ -215,7 +212,6 @@
                         <p class="note-small">Final de Zona Oriental.</p>
                     </div>
 
-                    <!-- GRAN FINAL -->
                     <div class="round-block" style="margin-top: 1.5rem; border: 3px solid var(--rojo-vibrante); background: #fffdf5;">
                         <div class="round-title" style="background: var(--rojo-vibrante);">Gran Final Nacional (A ganar 4)</div>
                         <div class="match" style="border:none; background: transparent;">
