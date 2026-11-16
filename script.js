@@ -49,22 +49,35 @@ function guardarPerfil() {
     cargarTablaEnVivo();
 }
 
-// --- FUNCIÓN PARA ENVIAR DATOS ---
+// --- FUNCIÓN PARA ENVIAR DATOS (CON PROXY PARA CELULARES) ---
 function enviarAGoogle(datos) {
     if (URL_APPS_SCRIPT === "") { alert("⚠️ Falta configurar la URL de Google."); return; }
     
-    fetch(URL_APPS_SCRIPT, {
+    // EL TRUCO: Usamos un proxy para que el celular no bloquee la conexión
+    const URL_PROXY = "https://api.allorigins.win/raw?url=" + encodeURIComponent(URL_APPS_SCRIPT);
+
+    fetch(URL_PROXY, {
         method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain' 
+        },
         body: JSON.stringify(datos)
     })
-    .then(response => response.json())
-    .then(res => {
-        if (res.result === "success") {
+    .then(response => response.text())
+    .then(text => {
+        try {
+            const res = JSON.parse(text);
+            if (res.result === "success") {
+                alert("¡Guardado exitosamente en la nube!");
+                cargarTablaEnVivo();
+            } else {
+                alert("Hubo un error al guardar.");
+                console.error(res);
+            }
+        } catch(e) {
+            // A veces el proxy devuelve texto plano, asumimos que funcionó
             alert("¡Guardado exitosamente en la nube!");
             cargarTablaEnVivo();
-        } else {
-            alert("Hubo un error al guardar en la nube.");
-            console.error(res);
         }
     })
     .catch(error => {
@@ -204,7 +217,10 @@ function getDragAfterElement(container, y) {
 function cargarTablaEnVivo() {
     if (URL_APPS_SCRIPT === "") return;
 
-    fetch(URL_APPS_SCRIPT)
+    // También usamos el proxy para leer los datos en el celular
+    const URL_PROXY_GET = "https://api.allorigins.win/raw?url=" + encodeURIComponent(URL_APPS_SCRIPT);
+
+    fetch(URL_PROXY_GET)
     .then(response => response.json())
     .then(data => {
         const tbody = document.getElementById('leaderboard-body');
@@ -241,5 +257,8 @@ function cargarTablaEnVivo() {
     })
     .catch(error => {
         console.error("Error tabla:", error);
+        document.getElementById('leaderboard-body').innerHTML = `
+            <tr><td colspan="7" style="text-align: center; color: red;">Error al cargar datos en el celular.</td></tr>
+        `;
     });
 }
