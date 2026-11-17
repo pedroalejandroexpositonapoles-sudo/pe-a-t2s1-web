@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURACIÓN DE GOOGLE SHEETS (PEÑA T2S1)
 // ==========================================
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbxS8S0NzL3sXVdYTnUw5-nnu_a28WQjHXdnhhOH2kzFZ5SdlmkhKhGcH8hPSGVyzg29EA/exec";
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbzuJjf1TKPkU39brl0Iol-8z2K3ObWwvIiqRjPO-EnK7Y22xeOoo7LqhN4p1vZ0wyyfCQ/exec";
 
 // --- DATOS DE LOS EQUIPOS PARA LAS ZONAS ---
 const equiposOccidentales = ["Pinar del Río", "Isla de la Juventud", "Mayabeque", "Artemisa", "Industriales", "Matanzas", "Cienfuegos", "Villa Clara"];
@@ -29,9 +29,8 @@ window.onload = function() {
     }
     
     renderizarZonas();
-    cargarTablaEnVivo();
+    cargarDatosEnVivo();
 
-    // --- ARREGLO PARA EL BOTÓN EN CELULARES ---
     const btnGuardar = document.getElementById('btnGuardarPerfil');
     if (btnGuardar) {
         btnGuardar.addEventListener('click', guardarPerfil);
@@ -52,7 +51,7 @@ function guardarPerfil() {
     document.getElementById('saludo').textContent = `Hola, ${nombre}! Tu equipo es ${equipo}.`;
     alert(`¡Perfil guardado! Bienvenido, ${nombre} (Fan de ${equipo}).`);
     
-    cargarTablaEnVivo();
+    cargarDatosEnVivo();
 }
 
 // --- FUNCIÓN PARA ENVIAR DATOS (CON PROXY) ---
@@ -72,14 +71,14 @@ function enviarAGoogle(datos) {
             const res = JSON.parse(text);
             if (res.result === "success") {
                 alert("¡Guardado exitosamente en la nube!");
-                cargarTablaEnVivo();
+                cargarDatosEnVivo();
             } else {
                 alert("Hubo un error al guardar.");
                 console.error(res);
             }
         } catch(e) {
             alert("¡Guardado exitosamente en la nube!");
-            cargarTablaEnVivo();
+            cargarDatosEnVivo();
         }
     })
     .catch(error => {
@@ -92,13 +91,10 @@ function enviarAGoogle(datos) {
 function guardarPronosticosPlayoffs() {
     const nombre = localStorage.getItem('nombrePenaT2S1');
     const equipo = localStorage.getItem('equipoPenaT2S1');
-    
     if (!nombre) { alert("Primero guarda tu nombre en la pestaña de Inicio."); return; }
 
     const datos = {
-        nombre: nombre,
-        equipo: equipo || "Sin equipo",
-        tipo: "Playoffs",
+        nombre: nombre, equipo: equipo || "Sin equipo", tipo: "Playoffs",
         occ_1_2: `${document.getElementById('occ_1_vs_2').value}-${document.getElementById('occ_2_vs_1').value}`,
         occ_3_4: `${document.getElementById('occ_3_vs_4').value}-${document.getElementById('occ_4_vs_3').value}`,
         occ_repe: `${document.getElementById('occ_repechaje_a').value}-${document.getElementById('occ_repechaje_b').value}`,
@@ -110,7 +106,6 @@ function guardarPronosticosPlayoffs() {
         gran_final: `${document.getElementById('nacional_occ').value}-${document.getElementById('nacional_or').value}`,
         zona_occ: "-", zona_or: "-", campeon: "-", subcampeon: "-"
     };
-
     enviarAGoogle(datos);
 }
 
@@ -130,7 +125,6 @@ function guardarZonas() {
         gran_final: "-", zona_occ: ordenOcc, zona_or: ordenOr,
         campeon: "-", subcampeon: "-"
     };
-
     enviarAGoogle(datos);
 }
 
@@ -153,7 +147,6 @@ function guardarBonus() {
         gran_final: "-", zona_occ: "-", zona_or: "-",
         campeon: campeon, subcampeon: subcampeon
     };
-
     enviarAGoogle(datos);
 }
 
@@ -162,24 +155,18 @@ function renderizarZonas() {
     const zonaOcc = document.getElementById('zona-occidental');
     const zonaOr = document.getElementById('zona-oriental');
     if(!zonaOcc || !zonaOr) return;
-
-    zonaOcc.innerHTML = '';
-    zonaOr.innerHTML = '';
+    zonaOcc.innerHTML = ''; zonaOr.innerHTML = '';
 
     equiposOccidentales.forEach(eq => {
         const li = document.createElement('li');
-        li.draggable = true;
-        li.textContent = eq;
-        configurarDrag(li);
-        zonaOcc.appendChild(li);
+        li.draggable = true; li.textContent = eq;
+        configurarDrag(li); zonaOcc.appendChild(li);
     });
 
     equiposOrientales.forEach(eq => {
         const li = document.createElement('li');
-        li.draggable = true;
-        li.textContent = eq;
-        configurarDrag(li);
-        zonaOr.appendChild(li);
+        li.draggable = true; li.textContent = eq;
+        configurarDrag(li); zonaOr.appendChild(li);
     });
 }
 
@@ -195,11 +182,8 @@ document.addEventListener('dragover', e => {
     const dragging = document.querySelector('.dragging');
     if (!dragging) return;
     const afterElement = getDragAfterElement(lista, e.clientY);
-    if (afterElement == null) {
-        lista.appendChild(dragging);
-    } else {
-        lista.insertBefore(dragging, afterElement);
-    }
+    if (afterElement == null) { lista.appendChild(dragging); } 
+    else { lista.insertBefore(dragging, afterElement); }
 });
 
 function getDragAfterElement(container, y) {
@@ -207,16 +191,13 @@ function getDragAfterElement(container, y) {
     return draggableElements.reduce((closest, child) => {
         const box = child.getBoundingClientRect();
         const offset = y - box.top - box.height / 2;
-        if (offset < 0 && offset > closest.offset) {
-            return { offset: offset, element: child };
-        } else {
-            return closest;
-        }
+        if (offset < 0 && offset > closest.offset) { return { offset: offset, element: child }; } 
+        else { return closest; }
     }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
-// --- LEER Y DIBUJAR LA TABLA ---
-function cargarTablaEnVivo() {
+// --- LEER Y DIBUJAR DATOS (TABLA Y NOTICIAS) ---
+function cargarDatosEnVivo() {
     if (URL_APPS_SCRIPT === "") return;
 
     const URL_PROXY_GET = "https://api.allorigins.win/raw?url=" + encodeURIComponent(URL_APPS_SCRIPT);
@@ -224,8 +205,29 @@ function cargarTablaEnVivo() {
     fetch(URL_PROXY_GET)
     .then(response => response.json())
     .then(data => {
+        // 1. DIBUJAR NOTICIAS
+        const contenedorNoticias = document.getElementById('contenedorNoticias');
+        const listaNoticias = data.noticias || [];
+
+        if (listaNoticias.length === 0) {
+            contenedorNoticias.innerHTML = '<p style="color: #666; font-style: italic;">No hay noticias por el momento.</p>';
+        } else {
+            contenedorNoticias.innerHTML = '';
+            // Mostramos las noticias más recientes primero
+            listaNoticias.reverse().forEach(noticia => {
+                contenedorNoticias.innerHTML += `
+                    <div style="background: #f9f9f9; border-left: 4px solid var(--rojo-vibrante); padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+                        <small style="color: #888;">${noticia.Fecha || ''}</small>
+                        <h4 style="color: var(--azul-oscuro); margin: 5px 0;">${noticia.Titulo || 'Sin título'}</h4>
+                        <p style="margin: 0; font-size: 0.9rem;">${noticia.Mensaje || ''}</p>
+                    </div>
+                `;
+            });
+        }
+
+        // 2. DIBUJAR TABLA
         const tbody = document.getElementById('leaderboard-body');
-        const usuariosReales = data.filter(user => user.Nombre && user.Nombre !== "");
+        const usuariosReales = data.tabla.filter(user => user.Nombre && user.Nombre !== "");
 
         if (usuariosReales.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Aún no hay puntuaciones.</td></tr>';
@@ -251,15 +253,4 @@ function cargarTablaEnVivo() {
                 <td>${user.PJ || 0}</td>
                 <td>${user.Ganadores || 0}</td>
                 <td>${user.Exactos || 0}</td>
-                <td><strong>${user.Puntos || 0}</strong></td>
-            `;
-            tbody.appendChild(tr);
-        });
-    })
-    .catch(error => {
-        console.error("Error tabla:", error);
-        document.getElementById('leaderboard-body').innerHTML = `
-            <tr><td colspan="7" style="text-align: center;">Aún no hay puntuaciones.</td></tr>
-        `;
-    });
-}
+                <td><strong
