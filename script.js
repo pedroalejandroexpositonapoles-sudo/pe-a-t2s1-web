@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURACIÓN DE GOOGLE SHEETS (PEÑA T2S1)
 // ==========================================
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbzuJjf1TKPkU39brl0Iol-8z2K3ObWwvIiqRjPO-EnK7Y22xeOoo7LqhN4p1vZ0wyyfCQ/exec";
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbyfjo44kwsYsP6c-sB1LbBHU5lVdvKf6ECw0vW3ofcK1E3E26B7AYwiMP3Ys2a0TsTYfw/exec";
 
 // --- DATOS DE LOS EQUIPOS PARA LAS ZONAS ---
 const equiposOccidentales = ["Pinar del Río", "Isla de la Juventud", "Mayabeque", "Artemisa", "Industriales", "Matanzas", "Cienfuegos", "Villa Clara"];
@@ -213,7 +213,6 @@ function cargarDatosEnVivo() {
             contenedorNoticias.innerHTML = '<p style="color: #666; font-style: italic;">No hay noticias por el momento.</p>';
         } else {
             contenedorNoticias.innerHTML = '';
-            // Mostramos las noticias más recientes primero
             listaNoticias.reverse().forEach(noticia => {
                 contenedorNoticias.innerHTML += `
                     <div style="background: #f9f9f9; border-left: 4px solid var(--rojo-vibrante); padding: 10px; margin-bottom: 10px; border-radius: 4px;">
@@ -253,4 +252,13 @@ function cargarDatosEnVivo() {
                 <td>${user.PJ || 0}</td>
                 <td>${user.Ganadores || 0}</td>
                 <td>${user.Exactos || 0}</td>
-                <td><strong
+                <td><strong>${user.Puntos || 0}</strong></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    })
+    .catch(error => {
+        console.error("Error al cargar datos:", error);
+        document.getElementById('contenedorNoticias').innerHTML = '<p style="color: red;">Error al cargar noticias. Revisa la URL o la hoja de Excel.</p>';
+    });
+}
