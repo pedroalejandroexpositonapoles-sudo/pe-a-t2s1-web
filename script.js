@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURACIÓN DE GOOGLE SHEETS (PEÑA T2S1)
 // ==========================================
-const URL_APPS_SCRIPT = "PEGA_AQUI_TU_URL_NUEVA_DE_GOOGLE";
+const URL_APPS_SCRIPT = https://script.google.com/macros/s/AKfycbzP6gqtvXbv-q9_yUA1GNyZRg_Vk3to49smkPgXFhoDll-VjeGTHWSdf5hG7lWGACxTtQ/exec; // <--- PON TU URL AQUÍ
 
 // --- DATOS DE LOS EQUIPOS PARA LAS ZONAS ---
 const equiposOccidentales = ["Pinar del Río", "Isla de la Juventud", "Mayabeque", "Artemisa", "Industriales", "Matanzas", "Cienfuegos", "Villa Clara"];
@@ -224,7 +224,7 @@ function cargarDatosEnVivo() {
             });
         }
 
-        // 2. DIBUJAR TABLA
+        // 2. DIBUJAR TABLA CON MEDALLAS
         const tbody = document.getElementById('leaderboard-body');
         const usuariosReales = data.tabla.filter(user => user.Nombre && user.Nombre !== "");
 
@@ -245,14 +245,19 @@ function cargarDatosEnVivo() {
                 tr.style.fontWeight = "bold";
             }
 
+            let medalla = (index + 1) + "°";
+            if (index === 0) medalla = "🥇";
+            if (index === 1) medalla = "🥈";
+            if (index === 2) medalla = "🥉";
+
             tr.innerHTML = `
-                <td>${index + 1}</td>
+                <td style="font-size: 1.2rem; text-align: center;">${medalla}</td>
                 <td>${user.Nombre} ${user.Nombre === nombreActual ? '(Tú)' : ''}</td>
                 <td>${user.Equipo || '-'}</td>
                 <td>${user.PJ || 0}</td>
                 <td>${user.Ganadores || 0}</td>
                 <td>${user.Exactos || 0}</td>
-                <td><strong>${user.Puntos || 0}</strong></td>
+                <td style="color: var(--rojo-vibrante); font-weight: bold; font-size: 1.1rem;"><strong>${user.Puntos || 0}</strong></td>
             `;
             tbody.appendChild(tr);
         });
