@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURACIÓN DE GOOGLE SHEETS (PEÑA T2S1)
 // ==========================================
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbyfjo44kwsYsP6c-sB1LbBHU5lVdvKf6ECw0vW3ofcK1E3E26B7AYwiMP3Ys2a0TsTYfw/exec";
+const URL_APPS_SCRIPT = "PEGA_AQUI_TU_URL_NUEVA_DE_GOOGLE";
 
 // --- DATOS DE LOS EQUIPOS PARA LAS ZONAS ---
 const equiposOccidentales = ["Pinar del Río", "Isla de la Juventud", "Mayabeque", "Artemisa", "Industriales", "Matanzas", "Cienfuegos", "Villa Clara"];
@@ -54,11 +54,11 @@ function guardarPerfil() {
     cargarDatosEnVivo();
 }
 
-// --- FUNCIÓN PARA ENVIAR DATOS (CON PROXY) ---
+// --- FUNCIÓN PARA ENVIAR DATOS (CON PROXY CODETABS) ---
 function enviarAGoogle(datos) {
     if (URL_APPS_SCRIPT === "") { alert("⚠️ Falta configurar la URL de Google."); return; }
     
-    const URL_PROXY = "https://api.allorigins.win/raw?url=" + encodeURIComponent(URL_APPS_SCRIPT);
+    const URL_PROXY = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(URL_APPS_SCRIPT);
 
     fetch(URL_PROXY, {
         method: 'POST',
@@ -196,11 +196,11 @@ function getDragAfterElement(container, y) {
     }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
-// --- LEER Y DIBUJAR DATOS (TABLA Y NOTICIAS) ---
+// --- LEER Y DIBUJAR DATOS (TABLA Y NOTICIAS CON PROXY) ---
 function cargarDatosEnVivo() {
     if (URL_APPS_SCRIPT === "") return;
 
-    const URL_PROXY_GET = "https://api.allorigins.win/raw?url=" + encodeURIComponent(URL_APPS_SCRIPT);
+    const URL_PROXY_GET = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(URL_APPS_SCRIPT);
 
     fetch(URL_PROXY_GET)
     .then(response => response.json())
