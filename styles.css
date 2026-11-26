@@ -124,8 +124,9 @@ input:focus, select:focus { outline: none; border-color: var(--azul-oscuro); }
 
 .table-responsive { overflow-x: auto; }
 .score-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
-.score-table th, .score-table td { padding: 0.8rem; text-align: left; border-bottom: 1px solid var(--borde); }
+.score-table th, .score-table td { padding: 0.8rem; text-align: left; border-bottom: 1px solid var(--borde); vertical-align: middle; }
 .score-table th { background: var(--azul-oscuro); color: white; }
+.score-table tr { transition: background-color 0.2s; }
 .score-table tr:hover { background-color: #f9f9f9; }
 
 footer { text-align: center; margin-top: 3rem; color: #888; font-size: 0.9rem; position: relative; z-index: 1;}
