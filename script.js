@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURACIÓN DE GOOGLE SHEETS (PEÑA T2S1)
 // ==========================================
-const URL_APPS_SCRIPT = https://script.google.com/macros/s/AKfycbzP6gqtvXbv-q9_yUA1GNyZRg_Vk3to49smkPgXFhoDll-VjeGTHWSdf5hG7lWGACxTtQ/exec; // <--- PON TU URL AQUÍ
+const URL_APPS_SCRIPT = "PEGA_AQUI_TU_URL_NUEVA_DE_GOOGLE";
 
 // --- DATOS DE LOS EQUIPOS PARA LAS ZONAS ---
 const equiposOccidentales = ["Pinar del Río", "Isla de la Juventud", "Mayabeque", "Artemisa", "Industriales", "Matanzas", "Cienfuegos", "Villa Clara"];
