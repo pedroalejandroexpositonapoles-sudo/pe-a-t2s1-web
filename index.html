@@ -1,269 +1,379 @@
-// ==========================================
-// CONFIGURACIÓN DE GOOGLE SHEETS (PEÑA T2S1)
-// ==========================================
-const URL_APPS_SCRIPT = https://script.google.com/macros/s/AKfycbzP6gqtvXbv-q9_yUA1GNyZRg_Vk3to49smkPgXFhoDll-VjeGTHWSdf5hG7lWGACxTtQ/exec; // <--- PON TU URL AQUÍ
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peña T2S1 - App Oficial</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
-// --- DATOS DE LOS EQUIPOS PARA LAS ZONAS ---
-const equiposOccidentales = ["Pinar del Río", "Isla de la Juventud", "Mayabeque", "Artemisa", "Industriales", "Matanzas", "Cienfuegos", "Villa Clara"];
-const equiposOrientales = ["Sancti Spíritus", "Ciego de Ávila", "Camagüey", "Las Tunas", "Holguín", "Granma", "Guantánamo", "Santiago de Cuba"];
+    <!-- ENCABEZADO CON EL LOGO -->
+    <header class="main-header">
+        <div class="header-content">
+            <img src="logo.jpeg" alt="Logo Peña T2S1" class="logo-img">
+            <div class="header-text">
+                <h1>Peña Deportiva T2S1</h1>
+                <p>¡Millón unidos y compenetrados por el deporte!</p>
+            </div>
+        </div>
+    </header>
 
-// --- LÓGICA DE PESTAÑAS ---
-function cambiarPestana(idPestana, boton) {
-    const pestanas = document.querySelectorAll('.tab-content');
-    pestanas.forEach(p => p.classList.remove('active'));
-    const botones = document.querySelectorAll('.nav-btn');
-    botones.forEach(b => b.classList.remove('active'));
-    document.getElementById(idPestana).classList.add('active');
-    boton.classList.add('active');
-}
+    <!-- MENÚ SUPERIOR (Pestañas) -->
+    <nav class="app-nav">
+        <button class="nav-btn active" onclick="cambiarPestana('inicio', this)">Inicio</button>
+        <button class="nav-btn" onclick="cambiarPestana('playoffs', this)">Playoffs</button>
+        <button class="nav-btn" onclick="cambiarPestana('zonas', this)">Zonas</button>
+        <button class="nav-btn" onclick="cambiarPestana('bonus', this)">Bonus</button>
+        <button class="nav-btn" onclick="cambiarPestana('tabla', this)">Tabla</button>
+        <button class="nav-btn" onclick="cambiarPestana('historial', this)">Historial</button>
+    </nav>
 
-// --- INICIO ---
-window.onload = function() {
-    const nombreGuardado = localStorage.getItem('nombrePenaT2S1');
-    const equipoGuardado = localStorage.getItem('equipoPenaT2S1');
-    
-    if (nombreGuardado) {
-        document.getElementById('userName').value = nombreGuardado;
-        document.getElementById('saludo').textContent = `Hola, ${nombreGuardado}!`;
-        if (equipoGuardado) document.getElementById('equipoFavorito').value = equipoGuardado;
-    }
-    
-    renderizarZonas();
-    cargarDatosEnVivo();
+    <!-- CONTENEDOR PRINCIPAL DE 3 COLUMNAS -->
+    <div class="layout-grid">
+        
+        <!-- COLUMNA IZQUIERDA: OCCIDENTE -->
+        <aside class="sidebar left-sidebar">
+            <h3>Occidente</h3>
+            <div class="team-logos-grid">
+                <img src="logopinardelrio.jpeg" alt="Pinar del Río" class="team-logo" title="Pinar del Río">
+                <img src="logolaisladelajuventud.jpeg" alt="Isla de la Juventud" class="team-logo" title="Isla de la Juventud">
+                <img src="logomayabeque.jpeg" alt="Mayabeque" class="team-logo" title="Mayabeque">
+                <img src="logoartemisa.jpeg" alt="Artemisa" class="team-logo" title="Artemisa">
+                <img src="logoindustriales.jpeg" alt="Industriales" class="team-logo" title="Industriales">
+                <img src="logomatanzas.jpeg" alt="Matanzas" class="team-logo" title="Matanzas">
+                <img src="logocienfuegos.jpeg" alt="Cienfuegos" class="team-logo" title="Cienfuegos">
+                <img src="logovillaclara.jpeg" alt="Villa Clara" class="team-logo" title="Villa Clara">
+            </div>
+        </aside>
 
-    const btnGuardar = document.getElementById('btnGuardarPerfil');
-    if (btnGuardar) {
-        btnGuardar.addEventListener('click', guardarPerfil);
-    }
-};
-
-// --- GUARDAR PERFIL ---
-function guardarPerfil() {
-    const nombre = document.getElementById('userName').value.trim();
-    const equipo = document.getElementById('equipoFavorito').value;
-
-    if (nombre === "") { alert("Por favor, ingresa tu nombre."); return; }
-    if (equipo === "") { alert("Por favor, selecciona tu equipo favorito."); return; }
-
-    localStorage.setItem('nombrePenaT2S1', nombre);
-    localStorage.setItem('equipoPenaT2S1', equipo);
-    
-    document.getElementById('saludo').textContent = `Hola, ${nombre}! Tu equipo es ${equipo}.`;
-    alert(`¡Perfil guardado! Bienvenido, ${nombre} (Fan de ${equipo}).`);
-    
-    cargarDatosEnVivo();
-}
-
-// --- FUNCIÓN PARA ENVIAR DATOS (CON PROXY CODETABS) ---
-function enviarAGoogle(datos) {
-    if (URL_APPS_SCRIPT === "") { alert("⚠️ Falta configurar la URL de Google."); return; }
-    
-    const URL_PROXY = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(URL_APPS_SCRIPT);
-
-    fetch(URL_PROXY, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(datos)
-    })
-    .then(response => response.text())
-    .then(text => {
-        try {
-            const res = JSON.parse(text);
-            if (res.result === "success") {
-                alert("¡Guardado exitosamente en la nube!");
-                cargarDatosEnVivo();
-            } else {
-                alert("Hubo un error al guardar.");
-                console.error(res);
-            }
-        } catch(e) {
-            alert("¡Guardado exitosamente en la nube!");
-            cargarDatosEnVivo();
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert("Error de conexión. Revisa tu internet.");
-    });
-}
-
-// --- GUARDAR PRONÓSTICOS DE PLAYOFFS ---
-function guardarPronosticosPlayoffs() {
-    const nombre = localStorage.getItem('nombrePenaT2S1');
-    const equipo = localStorage.getItem('equipoPenaT2S1');
-    if (!nombre) { alert("Primero guarda tu nombre en la pestaña de Inicio."); return; }
-
-    const datos = {
-        nombre: nombre, equipo: equipo || "Sin equipo", tipo: "Playoffs",
-        occ_1_2: `${document.getElementById('occ_1_vs_2').value}-${document.getElementById('occ_2_vs_1').value}`,
-        occ_3_4: `${document.getElementById('occ_3_vs_4').value}-${document.getElementById('occ_4_vs_3').value}`,
-        occ_repe: `${document.getElementById('occ_repechaje_a').value}-${document.getElementById('occ_repechaje_b').value}`,
-        occ_final: `${document.getElementById('occ_final_a').value}-${document.getElementById('occ_final_b').value}`,
-        or_1_2: `${document.getElementById('or_1_vs_2').value}-${document.getElementById('or_2_vs_1').value}`,
-        or_3_4: `${document.getElementById('or_3_vs_4').value}-${document.getElementById('or_4_vs_3').value}`,
-        or_repe: `${document.getElementById('or_repechaje_a').value}-${document.getElementById('or_repechaje_b').value}`,
-        or_final: `${document.getElementById('or_final_a').value}-${document.getElementById('or_final_b').value}`,
-        gran_final: `${document.getElementById('nacional_occ').value}-${document.getElementById('nacional_or').value}`,
-        zona_occ: "-", zona_or: "-", campeon: "-", subcampeon: "-"
-    };
-    enviarAGoogle(datos);
-}
-
-// --- GUARDAR ZONAS ---
-function guardarZonas() {
-    const nombre = localStorage.getItem('nombrePenaT2S1');
-    const equipo = localStorage.getItem('equipoPenaT2S1');
-    if (!nombre) { alert("Primero guarda tu nombre en la pestaña de Inicio."); return; }
-
-    const ordenOcc = [...document.querySelectorAll('#zona-occidental li')].map(li => li.textContent).join(" > ");
-    const ordenOr = [...document.querySelectorAll('#zona-oriental li')].map(li => li.textContent).join(" > ");
-
-    const datos = {
-        nombre: nombre, equipo: equipo || "Sin equipo", tipo: "Zonas",
-        occ_1_2: "-", occ_3_4: "-", occ_repe: "-", occ_final: "-",
-        or_1_2: "-", or_3_4: "-", or_repe: "-", or_final: "-",
-        gran_final: "-", zona_occ: ordenOcc, zona_or: ordenOr,
-        campeon: "-", subcampeon: "-"
-    };
-    enviarAGoogle(datos);
-}
-
-// --- GUARDAR BONUS ---
-function guardarBonus() {
-    const nombre = localStorage.getItem('nombrePenaT2S1');
-    const equipo = localStorage.getItem('equipoPenaT2S1');
-    if (!nombre) { alert("Primero guarda tu nombre en la pestaña de Inicio."); return; }
-    
-    const campeon = document.getElementById('campeonSelect').value;
-    const subcampeon = document.getElementById('subcampeonSelect').value;
-
-    if (!campeon || !subcampeon) { alert("Debes seleccionar un Campeón y un Subcampeón."); return; }
-    if (campeon === subcampeon) { alert("El Campeón y el Subcampeón no pueden ser el mismo equipo."); return; }
-
-    const datos = {
-        nombre: nombre, equipo: equipo || "Sin equipo", tipo: "Bonus",
-        occ_1_2: "-", occ_3_4: "-", occ_repe: "-", occ_final: "-",
-        or_1_2: "-", or_3_4: "-", or_repe: "-", or_final: "-",
-        gran_final: "-", zona_occ: "-", zona_or: "-",
-        campeon: campeon, subcampeon: subcampeon
-    };
-    enviarAGoogle(datos);
-}
-
-// --- LÓGICA DE ARRASTRAR Y SOLTAR (ZONAS) ---
-function renderizarZonas() {
-    const zonaOcc = document.getElementById('zona-occidental');
-    const zonaOr = document.getElementById('zona-oriental');
-    if(!zonaOcc || !zonaOr) return;
-    zonaOcc.innerHTML = ''; zonaOr.innerHTML = '';
-
-    equiposOccidentales.forEach(eq => {
-        const li = document.createElement('li');
-        li.draggable = true; li.textContent = eq;
-        configurarDrag(li); zonaOcc.appendChild(li);
-    });
-
-    equiposOrientales.forEach(eq => {
-        const li = document.createElement('li');
-        li.draggable = true; li.textContent = eq;
-        configurarDrag(li); zonaOr.appendChild(li);
-    });
-}
-
-function configurarDrag(elemento) {
-    elemento.addEventListener('dragstart', () => elemento.classList.add('dragging'));
-    elemento.addEventListener('dragend', () => elemento.classList.remove('dragging'));
-}
-
-document.addEventListener('dragover', e => {
-    e.preventDefault();
-    const lista = e.target.closest('.drag-list');
-    if (!lista) return;
-    const dragging = document.querySelector('.dragging');
-    if (!dragging) return;
-    const afterElement = getDragAfterElement(lista, e.clientY);
-    if (afterElement == null) { lista.appendChild(dragging); } 
-    else { lista.insertBefore(dragging, afterElement); }
-});
-
-function getDragAfterElement(container, y) {
-    const draggableElements = [...container.querySelectorAll('li:not(.dragging)')];
-    return draggableElements.reduce((closest, child) => {
-        const box = child.getBoundingClientRect();
-        const offset = y - box.top - box.height / 2;
-        if (offset < 0 && offset > closest.offset) { return { offset: offset, element: child }; } 
-        else { return closest; }
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
-}
-
-// --- LEER Y DIBUJAR DATOS (TABLA Y NOTICIAS CON PROXY) ---
-function cargarDatosEnVivo() {
-    if (URL_APPS_SCRIPT === "") return;
-
-    const URL_PROXY_GET = "https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent(URL_APPS_SCRIPT);
-
-    fetch(URL_PROXY_GET)
-    .then(response => response.json())
-    .then(data => {
-        // 1. DIBUJAR NOTICIAS
-        const contenedorNoticias = document.getElementById('contenedorNoticias');
-        const listaNoticias = data.noticias || [];
-
-        if (listaNoticias.length === 0) {
-            contenedorNoticias.innerHTML = '<p style="color: #666; font-style: italic;">No hay noticias por el momento.</p>';
-        } else {
-            contenedorNoticias.innerHTML = '';
-            listaNoticias.reverse().forEach(noticia => {
-                contenedorNoticias.innerHTML += `
-                    <div style="background: #f9f9f9; border-left: 4px solid var(--rojo-vibrante); padding: 10px; margin-bottom: 10px; border-radius: 4px;">
-                        <small style="color: #888;">${noticia.Fecha || ''}</small>
-                        <h4 style="color: var(--azul-oscuro); margin: 5px 0;">${noticia.Titulo || 'Sin título'}</h4>
-                        <p style="margin: 0; font-size: 0.9rem;">${noticia.Mensaje || ''}</p>
+        <!-- COLUMNA CENTRAL (LAS PESTAÑAS) -->
+        <main class="main-content">
+            
+            <!-- PESTAÑA 1: INICIO -->
+            <section id="inicio" class="tab-content active">
+                <div class="card">
+                    <h2>Bienvenido a la Peña</h2>
+                    <p>Configura tu perfil para participar en los pronósticos.</p>
+                    
+                    <div class="input-group" style="flex-direction: column;">
+                        <label>Tu Nombre o Apodo:</label>
+                        <input type="text" id="userName" placeholder="Ej: Pedro10">
+                        
+                        <label style="margin-top: 10px;">Tu Equipo Favorito:</label>
+                        <select id="equipoFavorito">
+                            <option value="">Selecciona tu equipo...</option>
+                            <option value="Pinar del Río">Pinar del Río</option>
+                            <option value="Isla de la Juventud">Isla de la Juventud</option>
+                            <option value="Mayabeque">Mayabeque</option>
+                            <option value="Artemisa">Artemisa</option>
+                            <option value="Industriales">Industriales</option>
+                            <option value="Matanzas">Matanzas</option>
+                            <option value="Cienfuegos">Cienfuegos</option>
+                            <option value="Villa Clara">Villa Clara</option>
+                            <option value="Sancti Spíritus">Sancti Spíritus</option>
+                            <option value="Ciego de Ávila">Ciego de Ávila</option>
+                            <option value="Camagüey">Camagüey</option>
+                            <option value="Las Tunas">Las Tunas</option>
+                            <option value="Holguín">Holguín</option>
+                            <option value="Granma">Granma</option>
+                            <option value="Guantánamo">Guantánamo</option>
+                            <option value="Santiago de Cuba">Santiago de Cuba</option>
+                        </select>
+                        
+                        <button class="btn btn-primary" id="btnGuardarPerfil" style="margin-top: 15px;">Guardar Perfil</button>
                     </div>
-                `;
-            });
-        }
+                    <p id="saludo" class="highlight-text"></p>
+                </div>
 
-        // 2. DIBUJAR TABLA CON MEDALLAS
-        const tbody = document.getElementById('leaderboard-body');
-        const usuariosReales = data.tabla.filter(user => user.Nombre && user.Nombre !== "");
+                <div class="card">
+                    <h3>Noticias y Novedades</h3>
+                    <div id="contenedorNoticias">
+                        <p style="color: #666; font-style: italic;">Cargando noticias...</p>
+                    </div>
+                </div>
+            </section>
 
-        if (usuariosReales.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Aún no hay puntuaciones.</td></tr>';
-            return;
-        }
+            <!-- PESTAÑA 2: PLAYOFFS -->
+            <section id="playoffs" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Pronósticos de Playoffs</h2>
+                        <span class="badge" style="display: flex; align-items: center; gap: 5px;">Playoffs <img src="https://upload.wikimedia.org/wikipedia/commons/b/bd/Flag_of_Cuba.svg" alt="Cuba" style="width: 20px; height: 12px; border-radius: 2px;"></span>
+                    </div>
+                    <p class="instruction">Escribe cuántas victorias crees que tendrá el ganador. <strong>Zonas:</strong> a ganar 2. <strong>Final:</strong> a ganar 4.</p>
+                    
+                    <div class="round-block">
+                        <div class="round-title">Zona Occidental</div>
+                        <div class="match">
+                            <div class="team">
+                                <span class="team-name"><img src="logopinardelrio.jpeg" class="mini-logo"> Pinar del Río</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="occ_1_vs_2">
+                            </div>
+                            <span class="vs">vs</span>
+                            <div class="team">
+                                <span class="team-name"><img src="logovillaclara.jpeg" class="mini-logo"> Villa Clara</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="occ_2_vs_1">
+                            </div>
+                        </div>
+                        <p class="note-small">Ganador pasa a la Final. Perdedor al Repechaje.</p>
+                        
+                        <div class="match">
+                            <div class="team">
+                                <span class="team-name"><img src="logomatanzas.jpeg" class="mini-logo"> Matanzas</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="occ_3_vs_4">
+                            </div>
+                            <span class="vs">vs</span>
+                            <div class="team">
+                                <span class="team-name"><img src="logoindustriales.jpeg" class="mini-logo"> Industriales</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="occ_4_vs_3">
+                            </div>
+                        </div>
+                        <p class="note-small">Perdedor eliminado. Ganador al Repechaje.</p>
 
-        usuariosReales.sort((a, b) => (parseFloat(b.Puntos) || 0) - (parseFloat(a.Puntos) || 0));
+                        <div class="match">
+                            <div class="team">
+                                <span class="team-name">Perdedor 1-2</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="occ_repechaje_a">
+                            </div>
+                            <span class="vs">vs</span>
+                            <div class="team">
+                                <span class="team-name">Ganador 3-4</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="occ_repechaje_b">
+                            </div>
+                        </div>
+                        <p class="note-small">Repechaje: El que gane avanza a la Final.</p>
 
-        tbody.innerHTML = '';
-        const nombreActual = localStorage.getItem('nombrePenaT2S1');
+                        <div class="match final-match">
+                            <div class="team">
+                                <span class="team-name">Ganador 1-2</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="occ_final_a">
+                            </div>
+                            <span class="vs">vs</span>
+                            <div class="team">
+                                <span class="team-name">Ganador Repechaje</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="occ_final_b">
+                            </div>
+                        </div>
+                        <p class="note-small">Final de Zona Occidental.</p>
+                    </div>
 
-        usuariosReales.forEach((user, index) => {
-            const tr = document.createElement('tr');
-            if (user.Nombre === nombreActual) {
-                tr.style.backgroundColor = "#eef2f5";
-                tr.style.fontWeight = "bold";
-            }
+                    <div class="round-block" style="margin-top: 1.5rem;">
+                        <div class="round-title">Zona Oriental</div>
+                        <div class="match">
+                            <div class="team">
+                                <span class="team-name"><img src="logolastunas.jpeg" class="mini-logo"> Las Tunas</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="or_1_vs_2">
+                            </div>
+                            <span class="vs">vs</span>
+                            <div class="team">
+                                <span class="team-name"><img src="logosantiagodecuba.jpeg" class="mini-logo"> Santiago</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="or_2_vs_1">
+                            </div>
+                        </div>
+                        <p class="note-small">Ganador pasa a la Final. Perdedor al Repechaje.</p>
+                        
+                        <div class="match">
+                            <div class="team">
+                                <span class="team-name"><img src="logogranma.jpeg" class="mini-logo"> Granma</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="or_3_vs_4">
+                            </div>
+                            <span class="vs">vs</span>
+                            <div class="team">
+                                <span class="team-name"><img src="logocamaguey.jpeg" class="mini-logo"> Camagüey</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="or_4_vs_3">
+                            </div>
+                        </div>
+                        <p class="note-small">Perdedor eliminado. Ganador al Repechaje.</p>
 
-            let medalla = (index + 1) + "°";
-            if (index === 0) medalla = "🥇";
-            if (index === 1) medalla = "🥈";
-            if (index === 2) medalla = "🥉";
+                        <div class="match">
+                            <div class="team">
+                                <span class="team-name">Perdedor 1-2</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="or_repechaje_a">
+                            </div>
+                            <span class="vs">vs</span>
+                            <div class="team">
+                                <span class="team-name">Ganador 3-4</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="or_repechaje_b">
+                            </div>
+                        </div>
+                        <p class="note-small">Repechaje: El que gane avanza a la Final.</p>
 
-            tr.innerHTML = `
-                <td style="font-size: 1.2rem; text-align: center;">${medalla}</td>
-                <td>${user.Nombre} ${user.Nombre === nombreActual ? '(Tú)' : ''}</td>
-                <td>${user.Equipo || '-'}</td>
-                <td>${user.PJ || 0}</td>
-                <td>${user.Ganadores || 0}</td>
-                <td>${user.Exactos || 0}</td>
-                <td style="color: var(--rojo-vibrante); font-weight: bold; font-size: 1.1rem;"><strong>${user.Puntos || 0}</strong></td>
-            `;
-            tbody.appendChild(tr);
-        });
-    })
-    .catch(error => {
-        console.error("Error al cargar datos:", error);
-        document.getElementById('contenedorNoticias').innerHTML = '<p style="color: red;">Error al cargar noticias. Revisa la URL o la hoja de Excel.</p>';
-    });
-}
+                        <div class="match final-match">
+                            <div class="team">
+                                <span class="team-name">Ganador 1-2</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="or_final_a">
+                            </div>
+                            <span class="vs">vs</span>
+                            <div class="team">
+                                <span class="team-name">Ganador Repechaje</span>
+                                <input type="number" min="0" max="2" class="victory-input" id="or_final_b">
+                            </div>
+                        </div>
+                        <p class="note-small">Final de Zona Oriental.</p>
+                    </div>
+
+                    <div class="round-block" style="margin-top: 1.5rem; border: 3px solid var(--rojo-vibrante); background: #fffdf5;">
+                        <div class="round-title" style="background: var(--rojo-vibrante);">Gran Final Nacional (A ganar 4)</div>
+                        <div class="match" style="border:none; background: transparent;">
+                            <div class="team">
+                                <span class="team-name">Campeón Occ</span>
+                                <input type="number" min="0" max="4" class="victory-input" id="nacional_occ">
+                            </div>
+                            <span class="vs">vs</span>
+                            <div class="team">
+                                <span class="team-name">Campeón Or</span>
+                                <input type="number" min="0" max="4" class="victory-input" id="nacional_or">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-accent" onclick="guardarPronosticosPlayoffs()" style="width: 100%; margin-top: 1.5rem; padding: 15px; font-size: 1.1rem;">Guardar Playoffs</button>
+                </div>
+            </section>
+
+            <!-- PESTAÑA 3: ZONAS -->
+            <section id="zonas" class="tab-content">
+                <div class="card">
+                    <h2>Orden de las Zonas</h2>
+                    <p class="instruction">Arrastra y suelta los equipos para ordenarlos del 1ro al 8vo lugar.</p>
+                    
+                    <div class="groups-container">
+                        <div class="group-box">
+                            <h4>Zona Occidental</h4>
+                            <ul class="drag-list" id="zona-occidental"></ul>
+                        </div>
+                        <div class="group-box">
+                            <h4>Zona Oriental</h4>
+                            <ul class="drag-list" id="zona-oriental"></ul>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-accent" onclick="guardarZonas()" style="width: 100%; margin-top: 1.5rem; padding: 15px; font-size: 1.1rem;">Guardar Zonas</button>
+                </div>
+            </section>
+
+            <!-- PESTAÑA 4: BONUS -->
+            <section id="bonus" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Pronóstico Bonus</h2>
+                        <span class="badge">Final</span>
+                    </div>
+                    <p class="instruction">Adivina quién será el Campeón y Subcampeón para sumar puntos extra.</p>
+                    
+                    <div class="bonus-inputs">
+                        <div class="input-group" style="flex-direction: column; margin-bottom: 15px;">
+                            <label>Campeón:</label>
+                            <select id="campeonSelect">
+                                <option value="">Selecciona al Campeón...</option>
+                                <option value="Pinar del Río">Pinar del Río</option>
+                                <option value="Isla de la Juventud">Isla de la Juventud</option>
+                                <option value="Mayabeque">Mayabeque</option>
+                                <option value="Artemisa">Artemisa</option>
+                                <option value="Industriales">Industriales</option>
+                                <option value="Matanzas">Matanzas</option>
+                                <option value="Cienfuegos">Cienfuegos</option>
+                                <option value="Villa Clara">Villa Clara</option>
+                                <option value="Sancti Spíritus">Sancti Spíritus</option>
+                                <option value="Ciego de Ávila">Ciego de Ávila</option>
+                                <option value="Camagüey">Camagüey</option>
+                                <option value="Las Tunas">Las Tunas</option>
+                                <option value="Holguín">Holguín</option>
+                                <option value="Granma">Granma</option>
+                                <option value="Guantánamo">Guantánamo</option>
+                                <option value="Santiago de Cuba">Santiago de Cuba</option>
+                            </select>
+                        </div>
+                        
+                        <div class="input-group" style="flex-direction: column;">
+                            <label>Subcampeón:</label>
+                            <select id="subcampeonSelect">
+                                <option value="">Selecciona al Subcampeón...</option>
+                                <option value="Pinar del Río">Pinar del Río</option>
+                                <option value="Isla de la Juventud">Isla de la Juventud</option>
+                                <option value="Mayabeque">Mayabeque</option>
+                                <option value="Artemisa">Artemisa</option>
+                                <option value="Industriales">Industriales</option>
+                                <option value="Matanzas">Matanzas</option>
+                                <option value="Cienfuegos">Cienfuegos</option>
+                                <option value="Villa Clara">Villa Clara</option>
+                                <option value="Sancti Spíritus">Sancti Spíritus</option>
+                                <option value="Ciego de Ávila">Ciego de Ávila</option>
+                                <option value="Camagüey">Camagüey</option>
+                                <option value="Las Tunas">Las Tunas</option>
+                                <option value="Holguín">Holguín</option>
+                                <option value="Granma">Granma</option>
+                                <option value="Guantánamo">Guantánamo</option>
+                                <option value="Santiago de Cuba">Santiago de Cuba</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-accent" onclick="guardarBonus()" style="width: 100%; margin-top: 1.5rem;">Guardar Bonus</button>
+                </div>
+            </section>
+
+            <!-- PESTAÑA 5: TABLA -->
+            <section id="tabla" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🏆 Tabla de Posiciones</h2>
+                        <span class="badge">Ranking General</span>
+                    </div>
+                    <p class="instruction">Aquí puedes ver cómo va la competencia. Los puntos se actualizan en tiempo real.</p>
+                    
+                    <div class="table-responsive">
+                        <table class="score-table" id="scoreTable">
+                            <thead>
+                                <tr>
+                                    <th>Pos</th>
+                                    <th>Usuario</th>
+                                    <th>Equipo</th>
+                                    <th>PJ</th>
+                                    <th>Ganadores</th>
+                                    <th>Exactos</th>
+                                    <th>Pts</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard-body">
+                                <tr><td colspan="7" style="text-align: center;">Cargando posiciones...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PESTAÑA 6: HISTORIAL -->
+            <section id="historial" class="tab-content">
+                <div class="card">
+                    <h2>Historial de Torneos</h2>
+                    <p style="text-align: center; padding: 2rem; background: #eee;">(Sección en construcción - Aquí irán las fotos de la inauguración)</p>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- COLUMNA DERECHA: ORIENTE -->
+        <aside class="sidebar right-sidebar">
+            <h3>Oriente</h3>
+            <div class="team-logos-grid">
+                <img src="logosanctispiritus.jpeg" alt="Sancti Spíritus" class="team-logo" title="Sancti Spíritus">
+                <img src="logociegodeavila.jpeg" alt="Ciego de Ávila" class="team-logo" title="Ciego de Ávila">
+                <img src="logocamaguey.jpeg" alt="Camagüey" class="team-logo" title="Camagüey">
+                <img src="logolastunas.jpeg" alt="Las Tunas" class="team-logo" title="Las Tunas">
+                <img src="logoholguin.jpeg" alt="Holguín" class="team-logo" title="Holguín">
+                <img src="logogranma.jpeg" alt="Granma" class="team-logo" title="Granma">
+                <img src="logoguantanamo.jpeg" alt="Guantánamo" class="team-logo" title="Guantánamo">
+                <img src="logosantiagodecuba.jpeg" alt="Santiago de Cuba" class="team-logo" title="Santiago de Cuba">
+            </div>
+        </aside>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Peña T2S1 - ¡Rumbo al título!</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
